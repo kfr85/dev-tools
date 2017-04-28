@@ -141,3 +141,28 @@
         executable: "/home/vagrant/.rbenv/shims/bundle"
         chdir: "/home/vagrant/serverspec"
     
+    # infrataster
+    - name: make work directory
+      file:  
+        path: "/home/vagrant/infrataster"
+        owner: vagrant
+        group: vagrant
+        state: directory
+        mode: 0755
+    
+    - name: create gemfile
+      copy: 
+        dest: "/home/vagrant/infrataster/Gemfile"
+        owner: vagrant
+        content: |
+          source 'https://rubygems.org'
+     
+          gem 'infrataster'
+    
+    - name: install gems
+      bundler:
+        state: present
+        gemfile: "/home/vagrant/infrataster/Gemfile"
+        executable: "/home/vagrant/.rbenv/shims/bundle"
+        chdir: "/home/vagrant/infrataster"
+      become: no
