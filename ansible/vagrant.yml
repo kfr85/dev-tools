@@ -158,6 +158,7 @@
           source 'https://rubygems.org'
      
           gem 'infrataster'
+          gem 'infrataster-plugin-firewall'
     
     - name: install gems
       bundler:
