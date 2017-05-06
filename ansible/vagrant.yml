@@ -29,6 +29,18 @@
         name=vagrant
         shell=/usr/bin/zsh
   
+    - name: make dein.vim directory
+      file:
+        path: /home/.vim/dein/repos/github.com/Shougo/dein.vim
+        owner: vagrant
+        state: directory
+        recurse: yes
+    
+    - name: install dein.vim
+      git:
+        repo: "https://github.com/Shougo/dein.vim.git"
+        dest: /home/.vim/dein/repos/github.com/Shougo/dein.vim
+        
     # TODO: git clone dotsfile
     - name: make directory
       file:
