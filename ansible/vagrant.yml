@@ -13,9 +13,9 @@
       with_items:
         - fish
         - git
+        - tig
         - vim
 
-    # TODO: chsh zsh
     - name: change default shell
       user: >
         name=vagrant
@@ -33,7 +33,6 @@
         repo: "https://github.com/Shougo/dein.vim.git"
         dest: /home/.vim/dein/repos/github.com/Shougo/dein.vim
 
-    # TODO: git clone dotsfile
     - name: make directory
       file:
         path: "/home/vagrant/dev/src/github.com/rusagedougawa/dotfiles"
