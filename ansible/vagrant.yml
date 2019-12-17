@@ -9,7 +9,7 @@
     - name: install modules
       yum:
         name: "{{ packages }}"
-        state: present
+        state: latest
       vars:
         packages:
           - fish
@@ -18,7 +18,7 @@
           - vim
 
     - name: change default shell
-      user: >
+      user:
         name: vagrant
         shell: /usr/bin/fish
 
@@ -57,6 +57,7 @@
     - name: dein.vim
       shell:
         cmd: bash /home/vagrant/installer.sh /home/vagrant/.cache/dein
+      become_user: vagrant
 
     - name: make directory
       file:
