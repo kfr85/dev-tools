@@ -6,53 +6,45 @@
   become: yes
   tasks:
     # common
-    - name: install modules 
-      apt: >
+    - name: install modules
+      yum: >
         name={{ item }}
         state=present
       with_items:
-        - zsh
+        - fish
         - git
         - vim
 
-    - name: edit zprofile
-      copy: 
-        dest:  /home/vagrant/.zprofile
-        content: |
-          for i in /etc/profile.d/*.sh ; do
-            [ -r $i ] && source $i
-          done
-    
     # TODO: chsh zsh
     - name: change default shell
       user: >
         name=vagrant
-        shell=/usr/bin/zsh
-  
+        shell=/usr/bin/fish
+
     - name: make dein.vim directory
       file:
         path: /home/.vim/dein/repos/github.com/Shougo/dein.vim
         owner: vagrant
         state: directory
         recurse: yes
-    
+
     - name: install dein.vim
       git:
         repo: "https://github.com/Shougo/dein.vim.git"
         dest: /home/.vim/dein/repos/github.com/Shougo/dein.vim
-        
+
     # TODO: git clone dotsfile
     - name: make directory
       file:
-        path: "/home/vagrant/dotfiles"
+        path: "/home/vagrant/dev/src/github.com/rusagedougawa/dotfiles"
         owner: vagrant
         state: directory
-        recurse: yes 
+        recurse: yes
 
     - name: install dot files
-      git: 
+      git:
         repo: "https://github.com/rusagedougawa/dotfiles.git"
-        dest: /home/vagrant/dotfiles
+        dest: /home/vagrant/dev/src/github.com/rusagedougawa/dotfiles
 
     - name: link dotfiles
       file:
@@ -60,8 +52,7 @@
         dest: "/home/vagrant/{{ item.dest }}"
         state: link
       with_items:
-        - { src: '.zshenv', dest: '.zshenv' }
-        - { src: '.vimrc', dest: '.vimrc' }
+        - { src: ".vimrc", dest: ".vimrc" }
 
     - name: make vim.dein directory
       file:
@@ -71,111 +62,6 @@
         recurse: yes
 
     - name: install vim.dein
-      git: 
+      git:
         repo: "https://github.com/Shougo/dein.vim.git"
         dest: /home/vagrant/.vim/dein/repos/github.com/Shougo/dein.vim
-
-    # serverspec
-    - name: install modules on which ruby depends
-      apt: >
-        name={{ item }}
-        state=present
-      with_items:
-        - libssl-dev 
-        - libreadline-dev
-        - zlib1g-dev
-    
-    - name: install rbenv
-      git: >
-        repo=https://github.com/sstephenson/rbenv.git
-        dest=/home/vagrant/.rbenv
-      
-    - name: install ruby-build
-      git: >
-        repo=https://github.com/sstephenson/ruby-build.git
-        dest=/home/vagrant/.rbenv/plugins/ruby-build
-    
-    - name: set permission
-      file:
-        path: "/home/vagrant/.rbenv"
-        owner: vagrant
-        state: directory
-        recurse: yes 
-
-    - name: export path
-      lineinfile: >
-        insertafter=EOF
-        line={{ item }}
-        path=/etc/profile.d/rbenv.sh
-        create=yes
-      with_items:
-        - 'export PATH="/home/vagrant/.rbenv/bin:$PATH"'
-        - 'eval "$(rbenv init -)"'
-    
-    - name: install ruby
-      shell: "/home/vagrant/.rbenv/bin/rbenv install -v 2.4.1 --skip-existing"
-      sudo: no
-    
-    - name: set version in the global environment
-      shell: "/home/vagrant/.rbenv/bin/rbenv global 2.4.1"
-      sudo: no
-    
-    - name: install bundler
-      shell: "/home/vagrant/.rbenv/bin/rbenv exec gem install bundler"
-      sudo: no
-
-    - name: copy shims
-      shell: "/home/vagrant/.rbenv/bin/rbenv rehash"
-      sudo: no
-    
-    - name: make work directory
-      file:  
-        path: "/home/vagrant/serverspec"
-        owner: vagrant
-        group: vagrant
-        state: directory
-        mode: 0755
-    
-    - name: create gemfile
-      copy: 
-        dest: "/home/vagrant/serverspec/Gemfile"
-        owner: vagrant
-        content: |
-          source 'https://rubygems.org'
-     
-          gem 'serverspec'
-          gem 'rake'
-    
-    - name: install gems
-      bundler:
-        state: present
-        gemfile: "/home/vagrant/serverspec/Gemfile"
-        executable: "/home/vagrant/.rbenv/shims/bundle"
-        chdir: "/home/vagrant/serverspec"
-    
-    # infrataster
-    - name: make work directory
-      file:  
-        path: "/home/vagrant/infrataster"
-        owner: vagrant
-        group: vagrant
-        state: directory
-        mode: 0755
-    
-    - name: create gemfile
-      copy: 
-        dest: "/home/vagrant/infrataster/Gemfile"
-        owner: vagrant
-        content: |
-          source 'https://rubygems.org'
-     
-          gem 'infrataster'
-          gem 'infrataster-plugin-firewall'
-    
-    - name: install gems
-      bundler:
-        state: present
-        gemfile: "/home/vagrant/infrataster/Gemfile"
-        executable: "/home/vagrant/.rbenv/shims/bundle"
-        chdir: "/home/vagrant/infrataster"
-      become: no
