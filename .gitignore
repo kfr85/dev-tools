@@ -1,0 +1,9 @@
+### https://raw.github.com/github/gitignore/1c114570c7659a59613ebc1fe45a5b07918df105/Global/Vagrant.gitignore
+
+# General
+.vagrant/
+
+# Log files (if you are creating logs in debug mode, uncomment this)
+# *.log
+
+
