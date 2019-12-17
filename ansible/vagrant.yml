@@ -7,19 +7,20 @@
   tasks:
     # common
     - name: install modules
-      yum: >
-        name={{ item }}
-        state=present
-      with_items:
-        - fish
-        - git
-        - tig
-        - vim
+      yum:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - fish
+          - git
+          - tig
+          - vim
 
     - name: change default shell
       user: >
-        name=vagrant
-        shell=/usr/bin/fish
+        name: vagrant
+        shell: /usr/bin/fish
 
     - name: make dein.vim directory
       file:
@@ -28,10 +29,34 @@
         state: directory
         recurse: yes
 
-    - name: install dein.vim
+    - name: make vim.dein directory
+      file:
+        dest: "/home/vagrant/.vim/dein/repos/github.com/Shougo/dein.vim"
+        owner: vagrant
+        state: directory
+        recurse: yes
+
+    - name: install vim.dein
       git:
         repo: "https://github.com/Shougo/dein.vim.git"
-        dest: /home/.vim/dein/repos/github.com/Shougo/dein.vim
+        dest: /home/vagrant/.vim/dein/repos/github.com/Shougo/dein.vim
+
+    - name: dein.vim
+      get_url:
+        url: https://raw.githubusercontent.com/Shougo/dein.vim/master/bin/installer.sh
+        dest: /home/vagrant/installer.sh
+        owner: vagrant
+
+    - name: dein.vim
+      file:
+        path: /home/vagrant/.cache/dein
+        owner: vagrant
+        state: directory
+        recurse: yes
+
+    - name: dein.vim
+      shell:
+        cmd: bash /home/vagrant/installer.sh /home/vagrant/.cache/dein
 
     - name: make directory
       file:
@@ -47,20 +72,8 @@
 
     - name: link dotfiles
       file:
-        src: "/home/vagrant/dotfiles/{{ item.src }}"
+        src: "/home/vagrant/dev/src/github.com/rusagedougawa/dotfiles/{{ item.src }}"
         dest: "/home/vagrant/{{ item.dest }}"
         state: link
       with_items:
         - { src: ".vimrc", dest: ".vimrc" }
-
-    - name: make vim.dein directory
-      file:
-        dest: "/home/vagrant/.vim/dein/repos/github.com/Shougo/dein.vim"
-        owner: vagrant
-        state: directory
-        recurse: yes
-
-    - name: install vim.dein
-      git:
-        repo: "https://github.com/Shougo/dein.vim.git"
-        dest: /home/vagrant/.vim/dein/repos/github.com/Shougo/dein.vim
